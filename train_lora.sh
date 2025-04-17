@@ -2,12 +2,12 @@
 
 # EAGLE 모델에서 LoRA 파라미터만 학습하는 스크립트
 
-# 캐시 디렉토리 설정
-export TRANSFORMERS_CACHE="/home/chokwans99/.cache/huggingface/hub"
-export HF_HOME="/home/chokwans99/.cache/huggingface"
+# # 캐시 디렉토리 설정
+# export TRANSFORMERS_CACHE="/home/chokwans99/.cache/huggingface/hub"
+# export HF_HOME="/home/chokwans99/.cache/huggingface"
 
-# GPU 설정 - GPU 1번만 사용
-export CUDA_VISIBLE_DEVICES=1
+# # GPU 설정 - GPU 1번만 사용
+# export CUDA_VISIBLE_DEVICES=1
 
 # 필요한 경로 설정
 BASE_MODEL_PATH="/home/chokwans99/EAGLE-2/EAGLE/mymodels"  # 베이스 모델 경로 (LLaMA, Qwen 등)
