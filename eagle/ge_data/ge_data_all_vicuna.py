@@ -19,7 +19,7 @@ from datasets import load_dataset
 import json
 from fastchat.model.model_adapter import get_conversation_template
 
-bigname="/home/chokwans99/EAGLE/models/vicuna-7b-v1.3"
+bigname="/home/chokwans99/LoRA_Eagle/EAGLE_LoRA/mymodels/vicuna-7b-v1.3"
 # bigname = "/home/lyh/weights/hf/llama/7B/"
 # smallname = "/home/lyh/weights/hf/llama/7B/"
 

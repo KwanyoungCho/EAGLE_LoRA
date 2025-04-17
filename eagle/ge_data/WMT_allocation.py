@@ -9,13 +9,11 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 
 s = 0
-# e = 68000 - 1
-e = 100 - 1
-#gpus = [[0],[1],[2],[3],[4],[5],[6],[7]]
-
+# 더 작은 수로 시작하여 테스트
+e = 30000 - 1  # 필요에 따라 조정 가능
 gpus=[[0],[1],[2],[3],[4],[5],[6],[7]]
 num_p = len(gpus)
-outdir = '{}/cnn_dailymail_{}_{}_mufp16'.format(args.outdir,s,e)
+outdir = '{}/wmt16_en_de_{}_{}_mufp16'.format(args.outdir,s,e)
 
 
 def split_range(start, end, n, over=False):
@@ -50,16 +48,12 @@ for i in range(num_p):
     index = i
     start = data_a[i][0]
     end = data_a[i][1]
-    # gpu_index_str = [str(i) for i in gpu_index]
-    # gpu_index_str=','.join(gpu_index_str)
     gpu_index = gpus[i]
     gpu_index_str = ' '.join(map(str, gpu_index))
-    # gpu_index_str='['+gpu_index_str+']'
-    command = "python /home/chokwans99/LoRA_Eagle/EAGLE_LoRA/eagle/ge_data/cnn_dailymail_ge_vicuna.py --start={} --end={} --index={} --gpu_index {} --outdir {}".format(start, end, index,
+    command = "python /home/chokwans99/LoRA_Eagle/EAGLE_LoRA/eagle/ge_data/WMT_ge_vicuna.py --start={} --end={} --index={} --gpu_index {} --outdir {}".format(start, end, index,
                                                                                                 gpu_index_str, outdir)
     commands.append(command)
-# run_command(commands[0])
-# commands=commands[:1]
+
 with ThreadPoolExecutor(max_workers=len(commands)) as executor:
     for command in commands:
         executor.submit(run_command, command)

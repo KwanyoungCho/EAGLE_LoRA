@@ -83,7 +83,7 @@ from ..model.lora_utils import CustomPeftModelForFeatureExtraction
 
 if accelerator.is_main_process:
     import wandb
-    wandb.init(project="eagle-lora", entity="yuhui-li", config=train_config)
+    wandb.init(project="eagle-lora-cnn_dailymail", entity="chaile9983", config=train_config)
 
 # 기본 모델 설정 로드
 baseconfig = AutoConfig.from_pretrained(args.basepath)
@@ -488,7 +488,7 @@ else:
 model.init_tree()
 
 # 모델 구조 출력
-print(model)
+# print(model)
 
 # LoRA 파라미터 상태 확인을 위한 디버깅 코드
 if accelerator.is_main_process:

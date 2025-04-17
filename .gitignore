@@ -163,4 +163,6 @@ checkpoints/
 mymodels/
 wandb/
 gendata/
+myDatasets/
+mt_bench/
 ShareGPT_V4.3_unfiltered_cleaned_split.json

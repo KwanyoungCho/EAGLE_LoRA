@@ -7,49 +7,27 @@ class CustomPeftModelForFeatureExtraction(nn.Module):
         super().__init__()
         self.base_model = model
         self.peft_config = peft_config
-        self.inference_mode = inference_mode  # 추론 모드 플래그
+        self.inference_mode = inference_mode
         
-        # 필요한 메서드 직접 연결 (중복 참조 없이)
-        self.init_tree = getattr(model, 'init_tree', None)
-        self.topK_genrate = getattr(model, 'topK_genrate', None)
-        self.reset_kv = getattr(model, 'reset_kv', None)
-        self.reset = getattr(model, 'reset', None)
+        # 필요한 메서드들을 직접 참조 - 중복 참조 없이
+        # 원본 모델 또는 내부 모델에서 메서드 찾기
+        target_model = model.base_model if hasattr(model, 'base_model') else model
         
-        # EAGLE 모델에 필요한 중요 속성들 직접 복사
-        # 이렇게 하면 속성을 검색할 때 무한 재귀를 방지할 수 있음
-        if hasattr(model, 'total_tokens'):
-            self.total_tokens = model.total_tokens
-        if hasattr(model, 'diff_device'):
-            self.diff_device = model.diff_device
-        if hasattr(model, 'headweight'):
-            self.headweight = model.headweight
-        if hasattr(model, 'layer_device'):
-            self.layer_device = model.layer_device
-        if hasattr(model, 'depth'):
-            self.depth = model.depth
-        if hasattr(model, 'top_k'):
-            self.top_k = model.top_k
-        if hasattr(model, 'threshold'):
-            self.threshold = model.threshold
+        # EAGLE 특수 메서드 복사
+        self.init_tree = getattr(target_model, 'init_tree', None)
+        self.topK_genrate = getattr(target_model, 'topK_genrate', None)
+        self.reset_kv = getattr(target_model, 'reset_kv', None)
+        self.reset = getattr(target_model, 'reset', None)
         
-        # 학습 가능한 매개변수 출력 기능 (lora_main.py와 호환)
+        # 학습 가능한 매개변수 출력 기능
         self.print_trainable_parameters = getattr(model, 'print_trainable_parameters', None)
-    
-    def __getattr__(self, name):
-        """
-        이 클래스에 없는 속성이나 메서드에 접근할 때 base_model에서 찾아 전달합니다.
-        무한 재귀를 방지하기 위해 안전장치를 추가했습니다.
-        """
-        # 'base_model'에 대한 접근은 무한 재귀를 발생시킬 수 있으므로 즉시 예외 발생
-        if name == 'base_model':
-            raise AttributeError(f"'{self.__class__.__name__}'에 'base_model' 속성이 없습니다")
-        
-        # 기본 모델에서 속성을 가져옴
-        if hasattr(self.base_model, name):
-            return getattr(self.base_model, name)
-        
-        # 명시적인 오류 메시지
-        raise AttributeError(f"'{self.__class__.__name__}' 또는 base_model에 '{name}' 속성이 없습니다")
+            
+        # EAGLE 모델에 필요한 중요 속성들 복사 - 간결한 방식으로
+        for attr in ['total_tokens', 'diff_device', 'headweight', 
+                    'layer_device', 'depth', 'top_k', 'threshold', 
+                    'hf_device_map']:
+            if hasattr(target_model, attr):
+                setattr(self, attr, getattr(target_model, attr))
     
     def save_pretrained(self, output_dir):
         if hasattr(self.base_model, 'save_pretrained'):
@@ -71,7 +49,7 @@ class CustomPeftModelForFeatureExtraction(nn.Module):
         return_dict=None,
         **kwargs
     ):
-        # 추론 모드에서는 requires_grad 설정 건너뜀
+        # 추론 모드가 아닐 때만 그래디언트 흐름을 위해 hidden_states의 requires_grad 확인
         if not self.inference_mode and hidden_states is not None and not hidden_states.requires_grad:
             hidden_states = hidden_states.detach().requires_grad_(True)
         
